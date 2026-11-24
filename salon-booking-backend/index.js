@@ -5,7 +5,9 @@ const cors = require("cors");
 
 const connectDB = require("./src/config/db");
 const adminRoutes = require("./src/routes/admin.routes");
-
+const serviceRoutes = require("./src/routes/service.routes");
+const staffRoutes = require("./src/routes/staff.routes");
+const bookingRoutes =require("./src/routes/booking.routes");
 const app = express();
 
 const PORT = process.env.PORT || 5000;
@@ -24,7 +26,9 @@ app.use(express.urlencoded({ extended: true }));
 
 // Routes
 app.use("/api/admin", adminRoutes);
-
+app.use("/api/services", serviceRoutes);
+app.use("/api/staff", staffRoutes);
+app.use("/api/bookings", bookingRoutes);
 // Test route
 app.get("/", (req, res) => {
   res.json({

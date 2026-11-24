@@ -1,4 +1,4 @@
-import { BrowserRouter, Route, Routes } from 'react-router-dom'
+import { BrowserRouter, Navigate, Route, Routes } from 'react-router-dom'
 
 import { Layout } from './components/Layout'
 
@@ -15,21 +15,19 @@ import { AdminRegister } from './pages/adminRegister'
 
 import { ProtectedAdminRoute } from './routs/ProtectedRoutes'
 
-export default function App() {
+function App() {
   return (
     <BrowserRouter>
       <Routes>
 
         {/* =========================
-            CUSTOMER WEBSITE
+            CUSTOMER ROUTES
         ========================= */}
+
         <Route element={<Layout />}>
           <Route path="/" element={<Home />} />
 
-          <Route
-            path="/services"
-            element={<Services />}
-          />
+          <Route path="/services" element={<Services />} />
 
           <Route
             path="/book/:id"
@@ -69,7 +67,7 @@ export default function App() {
 
 
         {/* =========================
-            PROTECTED ADMIN PANEL
+            PROTECTED ADMIN
         ========================= */}
 
         <Route element={<ProtectedAdminRoute />}>
@@ -81,15 +79,17 @@ export default function App() {
 
 
         {/* =========================
-            404
+            FALLBACK
         ========================= */}
 
         <Route
           path="*"
-          element={<Home />}
+          element={<Navigate to="/" replace />}
         />
 
       </Routes>
     </BrowserRouter>
   )
 }
+
+export default App

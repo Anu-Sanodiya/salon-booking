@@ -1,11 +1,13 @@
 export type PricingOption = {
   id: number
-  label?: string
+  _id?: string
+  label: string
   salonPrice: number
   homePrice?: number
 }
 
 export type Service = {
+  id: number
   _id: string
   name: string
   category: string
@@ -39,16 +41,25 @@ const make = (
   image: string,
   options?: PricingOption[],
   popular = false,
-): Service => ({
-  id: nextId++,
-  name,
-  category,
-  description,
-  salonPrice,
-  image,
-  options,
-  popular,
-})
+): Service => {
+  const id = nextId++
+
+  return {
+    id,
+    _id: `mock-service-${id}`,
+    name,
+    category,
+    description,
+    duration: 30,
+    salonPrice,
+    homePrice: null,
+    image,
+    popular,
+    homeServiceAvailable: false,
+    isActive: true,
+    options: options ?? [],
+  }
+}
 
 export const services: Service[] = [
   // HAIR SERVICES

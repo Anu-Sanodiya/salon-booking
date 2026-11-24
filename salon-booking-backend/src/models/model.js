@@ -229,14 +229,16 @@ const serviceSchema = new Schema(
    STAFF
 ========================================================= */
 
+
 const staffSchema = new Schema(
   {
-    user: {
-      type: Schema.Types.ObjectId,
-      ref: "User",
+    name: {
+      type: String,
+      required: true,
+      trim: true,
     },
 
-    name: {
+    role: {
       type: String,
       required: true,
       trim: true,
@@ -244,52 +246,135 @@ const staffSchema = new Schema(
 
     phone: {
       type: String,
-      trim: true,
+      default: "",
     },
 
     email: {
       type: String,
-      trim: true,
+      default: "",
       lowercase: true,
+      trim: true,
     },
 
-    gender: {
+    image: {
       type: String,
-      enum: ["MALE", "FEMALE", "OTHER"],
+      default: "",
     },
 
-    designation: {
+    rating: {
+      type: Number,
+      default: 0,
+      min: 0,
+      max: 5,
+    },
+
+    availability: {
       type: String,
-      default: "Stylist",
+      enum: ["AVAILABLE", "BUSY", "OFF"],
+      default: "AVAILABLE",
     },
 
-    // Services this staff member can perform
     services: [
       {
-        type: Schema.Types.ObjectId,
-        ref: "Service",
+        type: String,
       },
     ],
 
-    isAvailable: {
+    isActive: {
       type: Boolean,
       default: true,
-    },
-
-    homeServiceAvailable: {
-      type: Boolean,
-      default: false,
-    },
-
-    profileImage: {
-      type: String,
-      default: "",
     },
   },
   {
     timestamps: true,
   }
 );
+
+const bookingSchema = new Schema(
+  {
+    serviceId: {
+      type: Schema.Types.ObjectId,
+      ref: "Service",
+      required: true,
+    },
+
+    staffId: {
+      type: Schema.Types.ObjectId,
+      ref: "Staff",
+      required: true,
+    },
+
+    customerName: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    customerPhone: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    customerEmail: {
+      type: String,
+      default: "",
+      trim: true,
+    },
+
+    date: {
+      type: String,
+      required: true,
+    },
+
+    time: {
+      type: String,
+      required: true,
+    },
+
+    location: {
+      type: String,
+      enum: ["SALON", "HOME"],
+      required: true,
+    },
+
+    notes: {
+      type: String,
+      default: "",
+    },
+
+    price: {
+      type: Number,
+      required: true,
+    },
+
+    status: {
+      type: String,
+      enum: [
+        "PENDING",
+        "CONFIRMED",
+        "CANCELLED",
+        "COMPLETED",
+      ],
+      default: "PENDING",
+    },
+
+    paymentStatus: {
+      type: String,
+      enum: [
+        "PENDING",
+        "PAID",
+        "FAILED",
+      ],
+      default: "PENDING",
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+
 
 
 /* =========================================================
@@ -692,7 +777,7 @@ const Message = mongoose.model("Message", messageSchema);
 
 const Review = mongoose.model("Review", reviewSchema);
 
-
+const Booking=mongoose.model("Booking", bookingSchema);
 /* =========================================================
    EXPORT
 ========================================================= */
@@ -708,4 +793,5 @@ module.exports = {
   Conversation,
   Message,
   Review,
+  Booking,
 };
