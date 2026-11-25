@@ -375,6 +375,51 @@ const bookingSchema = new Schema(
 );
 
 
+const customerSchema = new Schema(
+  {
+    name: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    email: {
+      type: String,
+      required: true,
+      unique: true,
+      lowercase: true,
+      trim: true,
+    },
+
+    phone: {
+      type: String,
+      required: true,
+      trim: true,
+    },
+
+    password: {
+      type: String,
+      required: true,
+      minlength: 6,
+    },
+
+    role: {
+      type: String,
+      enum: ["CUSTOMER"],
+      default: "CUSTOMER",
+    },
+
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  {
+    timestamps: true,
+  }
+);
+
+const Customer = mongoose.model("Customer", customerSchema);
 
 
 /* =========================================================
@@ -566,23 +611,6 @@ const appointmentSchema = new Schema(
     timestamps: true,
   }
 );
-
-
-/* =========================================================
-   PAYMENT
-
-   Supports:
-   - Razorpay
-   - Cash
-   - UPI
-   - Card
-
-   Status:
-   - PENDING
-   - SUCCESS
-   - FAILED
-   - REFUNDED
-========================================================= */
 
 const paymentSchema = new Schema(
   {
@@ -793,5 +821,6 @@ module.exports = {
   Conversation,
   Message,
   Review,
+  Customer,
   Booking,
 };

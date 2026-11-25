@@ -29,6 +29,10 @@ import {
   type Staff,
 } from '../staffApi'
 
+import {
+  isCustomerLoggedIn,
+} from '../cutomerAuthApi'
+
 
 export function Booking() {
   const { id } = useParams()
@@ -112,7 +116,6 @@ export function Booking() {
         err?.message ||
           'Failed to load booking details'
       )
-
     } finally {
       setLoading(false)
     }
@@ -136,10 +139,14 @@ export function Booking() {
 
 
   // ==================================================
-  // CONTINUE
+  // CONTINUE TO PAYMENT
   // ==================================================
 
   function continueToPayment() {
+
+    // -----------------------------------------------
+    // SERVICE VALIDATION
+    // -----------------------------------------------
 
     if (!service) {
       setError(
@@ -148,12 +155,22 @@ export function Booking() {
       return
     }
 
+
+    // -----------------------------------------------
+    // PROFESSIONAL VALIDATION
+    // -----------------------------------------------
+
     if (!selectedStaff) {
       setError(
         'Please choose a professional'
       )
       return
     }
+
+
+    // -----------------------------------------------
+    // DATE VALIDATION
+    // -----------------------------------------------
 
     if (!date) {
       setError(
@@ -162,12 +179,22 @@ export function Booking() {
       return
     }
 
+
+    // -----------------------------------------------
+    // TIME VALIDATION
+    // -----------------------------------------------
+
     if (!time) {
       setError(
         'Please select a time'
       )
       return
     }
+
+
+    // -----------------------------------------------
+    // HOME SERVICE VALIDATION
+    // -----------------------------------------------
 
     if (
       location === 'home' &&
@@ -178,6 +205,11 @@ export function Booking() {
       )
       return
     }
+
+
+    // -----------------------------------------------
+    // HOME PRICE VALIDATION
+    // -----------------------------------------------
 
     if (
       location === 'home' &&
@@ -190,6 +222,10 @@ export function Booking() {
     }
 
 
+    // -----------------------------------------------
+    // FIND SELECTED PROFESSIONAL
+    // -----------------------------------------------
+
     const selectedProfessional =
       staffList.find(
         (person) =>
@@ -197,21 +233,20 @@ export function Booking() {
       )
 
 
-    const payload = {
-      serviceId:
-        service._id,
+    // -----------------------------------------------
+    // CREATE BOOKING DRAFT
+    // -----------------------------------------------
 
-      serviceName:
-        service.name,
+    const payload = {
+      serviceId: service._id,
+      serviceName: service.name,
 
       location,
 
       date,
-
       time,
 
-      staffId:
-        selectedStaff,
+      staffId: selectedStaff,
 
       staffName:
         selectedProfessional?.name,
@@ -220,10 +255,13 @@ export function Booking() {
 
       notes,
 
-      amount:
-        price,
+      amount: price,
     }
 
+
+    // -----------------------------------------------
+    // SAVE TEMPORARY BOOKING DATA
+    // -----------------------------------------------
 
     sessionStorage.setItem(
       'salonBookingDraft',
@@ -232,6 +270,27 @@ export function Booking() {
 
 
     setError('')
+
+
+    // -----------------------------------------------
+    // CUSTOMER LOGIN CHECK
+    // -----------------------------------------------
+
+    if (!isCustomerLoggedIn()) {
+
+      navigate('/login', {
+        state: {
+          redirectTo: '/payment',
+        },
+      })
+
+      return
+    }
+
+
+    // -----------------------------------------------
+    // ALREADY LOGGED IN
+    // -----------------------------------------------
 
     navigate('/payment')
   }
@@ -301,6 +360,8 @@ export function Booking() {
   return (
     <section className="container-page py-12">
 
+      {/* BACK */}
+
       <Link
         to="/services"
         className="text-sm font-bold text-ink/60 hover:text-ink"
@@ -353,13 +414,11 @@ export function Booking() {
             <div className="mt-5 flex flex-wrap gap-4 text-sm font-semibold text-ink/65">
 
               <span className="flex items-center gap-2">
-
                 <Clock size={16} />
 
                 {service.duration
                   ? `${service.duration} minutes`
                   : 'Timing confirmed by salon'}
-
               </span>
 
 
@@ -416,9 +475,10 @@ export function Booking() {
                   service.salonPrice
                 }
                 text="Visit our studio"
-                onClick={() =>
+                onClick={() => {
                   setLocation('salon')
-                }
+                  setError('')
+                }}
               />
 
 
@@ -432,9 +492,10 @@ export function Booking() {
                   service.homePrice
                 }
                 text="We come to you"
-                onClick={() =>
+                onClick={() => {
                   setLocation('home')
-                }
+                  setError('')
+                }}
               />
 
             </div>
@@ -465,11 +526,12 @@ export function Booking() {
                       .toISOString()
                       .split('T')[0]
                   }
-                  onChange={(event) =>
+                  onChange={(event) => {
                     setDate(
                       event.target.value
                     )
-                  }
+                    setError('')
+                  }}
                   className="w-full rounded-2xl border border-ink/10 bg-sand px-4 py-3 pl-10 outline-none focus:ring-2 focus:ring-gold"
                 />
 
@@ -482,11 +544,12 @@ export function Booking() {
 
               <select
                 value={time}
-                onChange={(event) =>
+                onChange={(event) => {
                   setTime(
                     event.target.value
                   )
-                }
+                  setError('')
+                }}
                 className="w-full rounded-2xl border border-ink/10 bg-sand px-4 py-3 outline-none focus:ring-2 focus:ring-gold"
               >
 
@@ -546,9 +609,7 @@ export function Booking() {
                   (person) => (
 
                     <button
-                      key={
-                        person._id
-                      }
+                      key={person._id}
                       type="button"
                       onClick={() => {
                         setSelectedStaff(
@@ -579,11 +640,11 @@ export function Booking() {
                       ) : (
 
                         <div className="mx-auto grid h-14 w-14 place-items-center rounded-full bg-ink text-sm font-black text-white">
+
                           {person.name
-                            .charAt(
-                              0
-                            )
+                            .charAt(0)
                             .toUpperCase()}
+
                         </div>
 
                       )}
@@ -693,15 +754,18 @@ export function Booking() {
               </p>
 
               <p className="text-3xl font-black">
+
                 {price != null
                   ? `₹${price}`
                   : 'On request'}
+
               </p>
 
             </div>
 
 
             <button
+              type="button"
               onClick={
                 continueToPayment
               }
@@ -735,10 +799,10 @@ export function Booking() {
 
 
           <p className="mt-3 text-xs leading-5 text-ink/50">
-            Your selected professional is reserved
-            for the next step. Final availability and
-            payment verification should be handled by
-            the booking backend.
+            You can browse and select your appointment
+            without logging in. Login or registration
+            is required only when you continue to
+            payment.
           </p>
 
         </div>

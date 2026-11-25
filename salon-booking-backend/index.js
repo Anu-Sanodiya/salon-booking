@@ -8,6 +8,9 @@ const adminRoutes = require("./src/routes/admin.routes");
 const serviceRoutes = require("./src/routes/service.routes");
 const staffRoutes = require("./src/routes/staff.routes");
 const bookingRoutes =require("./src/routes/booking.routes");
+const authRoutes = require("./src/routes/auth.routes");
+
+
 const app = express();
 
 const PORT = process.env.PORT || 5000;
@@ -29,6 +32,7 @@ app.use("/api/admin", adminRoutes);
 app.use("/api/services", serviceRoutes);
 app.use("/api/staff", staffRoutes);
 app.use("/api/bookings", bookingRoutes);
+app.use("/api/auth", authRoutes);
 // Test route
 app.get("/", (req, res) => {
   res.json({
